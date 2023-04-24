@@ -135,15 +135,32 @@ public class Game {
         game.setImage(d.getString("image"));
 
         //retrieve the embedded doc consisting of array
-        List<Document> reviewDocsList = d.getList("reviews", Document.class);
+        //Mistake List<Document> reviewDocsList = (List<Document>)d.get("reviews");: 
+        //Cannot cast reviews attribute to List<Document>. In our aggregation in repo, "reviews" consist of array of ObjectId values
+        // So casting to List<Document> will fail resulting in ClassCastException. Correct casting should be List<ObjectId>
+        
+        //we use Object because Object is parent of all class. So no error will occur. Use this when we are unsure what is 
+        //the exact data type of object being retrieved. But subsequently we still need to cast it to the right data type as 
+        //seen in ((ObjectId) object)
+        List<Object> objectList = (ArrayList<Object>) d.get("reviews");
         List<String> reviewsUrl = new ArrayList<>();
         
-        for(Document reviewDoc : reviewDocsList){
-            ObjectId oId = reviewDoc.getObjectId("_id");
+        for(Object object : objectList){
+            ObjectId oId = (ObjectId) object;
             reviewsUrl.add("/review/"+oId.toString());
         }
 
+        /*Alternate method:
+         * Object reviewsField = d.get("reviews");
+         * if (reviewsField instanceof List<ObjectId>) {
+            List<ObjectId> reviewIdsList = (List<ObjectId>) reviewsField;
+            for (ObjectId reviewId : reviewIdsList) {
+                reviewsUrl.add("/review/" + reviewId.toString());
+    }
+         */
+
         game.setReviews(reviewsUrl);
+        game.setTimestamp(LocalDateTime.now());
 
         return game;
     }

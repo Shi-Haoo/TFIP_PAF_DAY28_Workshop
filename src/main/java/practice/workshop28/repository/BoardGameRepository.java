@@ -64,7 +64,7 @@ public class BoardGameRepository {
         Game g = Game.convertFromDocument(docs.get(0));
 
         /*Alternate method:
-         * if (!results.iterator().hasNext()) {
+          if (!results.iterator().hasNext()) {
             return Optional.empty();
         }
         Document d = results.iterator().next();
